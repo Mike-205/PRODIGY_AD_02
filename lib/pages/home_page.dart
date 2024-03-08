@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:prodigy_ad_02/provider/task_data.dart';
 import 'package:prodigy_ad_02/widgets/to_do_tile.dart';
+import 'package:provider/provider.dart';
 
 import '../colors/app_colors.dart';
 import '../widgets/dialog_box.dart';
@@ -13,20 +15,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  Map<String, bool> toDoTask = {
-    "Wash my clothes" : false,
-    "Code in the evening": false,
-    "Visit Kimaru" : false,
-    "Hiking" : false,
-    "Go to the gym" : false,
-    "Read a book" : false,
-  };
+  void onSaved (){
+    Provider.of<TaskData>(context, listen: false).addTask(myController.text);
+    myController.clear();
+    Navigator.of(context).pop();
+  }
 
-  void saveNewTask (){
-    setState(() {
-      toDoTask[myController.text] = false;
-      myController.clear();
-    });
+  void onCancelled (){
+    myController.clear();
     Navigator.of(context).pop();
   }
 
@@ -36,23 +32,11 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context){
         return DialogBox(
           controller: myController,
-          onSave: saveNewTask,
-          onCancel: () => Navigator.of(context).pop(),
+          onSave: onSaved,
+          onCancel: onCancelled
         );
       }
     );
-  }
-
-  void deleteTask(int index){
-    setState(() {
-      toDoTask.remove(toDoTask.keys.elementAt(index));
-    });
-  }
-
-  void onChanged (bool value, int index){
-    setState(() {
-      toDoTask[toDoTask.keys.elementAt(index)] = !toDoTask.values.elementAt(index);
-    });
   }
 
   final myController = TextEditingController();
@@ -69,20 +53,33 @@ class _HomePageState extends State<HomePage> {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Container(
+          child: SizedBox(
             height: 600,
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: toDoTask.length,
+              itemCount: Provider.of<TaskData>(context).toDoTask.length,
               scrollDirection: Axis.vertical,
               itemBuilder: (context, index){
-                return Expanded(child: ToDoTile(text: toDoTask.keys.elementAt(index) ,value: toDoTask.values.elementAt(index), onChanged: (value) => onChanged(value!, index), onPressed: (context) => deleteTask(index),));
+                String key = Provider.of<TaskData>(context).toDoTask.keys.elementAt(index);
+                return Expanded(
+                  child: ToDoTile(
+                    text: key,
+                    value: Provider.of<TaskData>(context).toDoTask[key]!,
+                    onChanged: (value){
+                      Provider.of<TaskData>(context, listen: false).toggleTask(key);
+                    },
+                    onPressed: (context){
+                      Provider.of<TaskData>(context, listen: false).deleteTask(key);
+                    }
+                  )
+                );
               },
             ),
           )
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: createNewTask,
+          elevation: 2,
           backgroundColor: AppColors.appBarColor,
           child: const Icon(Icons.add),
         )
@@ -90,3 +87,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

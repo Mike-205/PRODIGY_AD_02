@@ -3,9 +3,9 @@ import 'package:prodigy_ad_02/colors/app_colors.dart';
 
 class DialogButton extends StatefulWidget {
   final String text;
-  void Function()? onPressed;
+  final void Function()? onPressed;
 
-  DialogButton({
+  const DialogButton({
     super.key,
     required this.text,
     required this.onPressed
