@@ -61,8 +61,7 @@ class _HomePageState extends State<HomePage> {
               scrollDirection: Axis.vertical,
               itemBuilder: (context, index){
                 String key = Provider.of<TaskData>(context).toDoTask.keys.elementAt(index);
-                return Expanded(
-                  child: ToDoTile(
+                return ToDoTile(
                     text: key,
                     value: Provider.of<TaskData>(context).toDoTask[key]!,
                     onChanged: (value){
@@ -71,7 +70,6 @@ class _HomePageState extends State<HomePage> {
                     onPressed: (context){
                       Provider.of<TaskData>(context, listen: false).deleteTask(key);
                     }
-                  )
                 );
               },
             ),
